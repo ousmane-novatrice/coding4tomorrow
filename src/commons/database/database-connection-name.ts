@@ -1,0 +1,1 @@
+export const databaseConnectionName: string = "coding4tomorrow-database-connection";

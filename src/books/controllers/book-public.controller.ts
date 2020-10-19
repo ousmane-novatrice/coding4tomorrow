@@ -4,8 +4,9 @@ import { ClientFilterInput } from "~/commons/graphql/types-and-inputs/client-fil
 import { Body, Controller, Delete, Get, HttpStatus, Param, Res, UseGuards } from "@nestjs/common";
 import { BookCoverService } from "~/multimedia/images/services/book-cover.service";
 import { FetchBookCoverParam } from "../dto/fetchBookCover.param";
+import { BookType } from "../enums/book-type.enum";
 
-@Controller('book')
+@Controller('public/book')
 export class BookPublicController {
     constructor(
         private readonly bookService: BookService,
@@ -14,14 +15,14 @@ export class BookPublicController {
 
     @Get(':id')
     fetchBook(@Param('id') bookId: string): Promise<IBook> {
-        return this.bookService.findOneByIdOrFail(bookId);
+        return this.bookService.findOneOrFail({ _id: bookId, type: BookType.Public });
     }
 
     @Get()
     fetchBooks(
         @Body('clientFilter') clientFilter: ClientFilterInput,
     ): Promise<IBook[]> {
-        return this.bookService.find({}, clientFilter);
+        return this.bookService.find({ type: BookType.Public }, clientFilter);
     }
 
     @Get('cover/:id')

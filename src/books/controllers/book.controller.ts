@@ -1,7 +1,7 @@
 import { BookService } from "~/books/services/book.service";
 import { BookInput } from "~/books/dto/book.input";
 import { UpdateBookInput } from "~/books/dto/update-book.input";
-import { Body, Controller, Delete, Param, Post, Put, Res, UnprocessableEntityException, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res, UnprocessableEntityException, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { imageFilter } from "~/multimedia/images/image-filter";
 import { IncomingFile } from "~/commons/multimedia/typings/incoming-file";
@@ -9,6 +9,9 @@ import { allowedImageFormats } from "~/multimedia/images/images-restrictions";
 import { BookCoverService } from "~/multimedia/images/services/book-cover.service";
 import { Book } from "~/books/dto/book.entity";
 import { AuthGuard } from "~/auth/guards/auth-guard";
+import { ClientFilterInput } from "~/commons/graphql/types-and-inputs/client-filter.input";
+import { IBook } from "../models/interfaces/book.interface";
+import { FetchBookCoverParam } from "../dto/fetchBookCover.param";
 
 @UseGuards(AuthGuard)
 @Controller('book')
@@ -54,5 +57,17 @@ export class BookController {
       @Param('id') bookId: string
     ): Promise<boolean> {
         return this.bookService.removeOneByIdOrFail(bookId);
+    }
+
+    @Get(':id')
+    fetchBook(@Param('id') bookId: string): Promise<IBook> {
+        return this.bookService.findOneByIdOrFail(bookId);
+    }
+
+    @Get()
+    fetchBooks(
+        @Body('clientFilter') clientFilter: ClientFilterInput,
+    ): Promise<IBook[]> {
+        return this.bookService.find({}, clientFilter);
     }
 }
